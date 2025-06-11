@@ -14,6 +14,20 @@ if ($EdgeInstaller) {
 
 
 Start-Job -ScriptBlock {
+    # 下载 Gpg4win 4.4.0 安装程序
+    $gpgUrl     = "https://files.gpg4win.org/gpg4win-4.4.0.exe"
+    $outputPath = "$env:TEMP\gpg4win-4.4.0.exe"
+
+    Invoke-WebRequest -Uri $gpgUrl -OutFile $outputPath
+
+    # 静默安装（/S = silent，采用默认设置）
+    Start-Process -FilePath $outputPath -ArgumentList "/S" -Wait
+
+    # 清理安装文件
+    Remove-Item $outputPath
+}
+
+Start-Job -ScriptBlock {
     $url = "https://github.com/keepassxreboot/keepassxc/releases/download/2.7.10/KeePassXC-2.7.10-Win64.msi"
     $outputPath = "$env:TEMP\KeePassXC-Setup.msi"
     Invoke-WebRequest -Uri $url -OutFile $outputPath
