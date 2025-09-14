@@ -1,0 +1,20 @@
+{
+  "updateTime": "2025-06-07 19:26:01",
+  "domains": [
+    {
+      "displayName": "LINE A 201 PVE2153-2336 22521",
+      "port": 22521,
+      "status": "UP"
+    },
+    {
+      "displayName": "LINE B 205 R300-2309 22222",
+      "port": 22222,
+      "status": "UP"
+    },
+    {
+      "displayName": "LINE C 191 PVE01-2513 62323",
+      "port": 62323,
+      "status": "UP"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Line Status Check 2024</title>
+    <link rel="manifest" href="/index.json">
+    <style>
+        body { background-color: #333333; color: #00BFFF; font-size: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { text-align: left; padding: 8px; border-bottom: 1px solid #ddd; color: #00BFFF; }
+        tr:nth-child(even) { background-color: #444444; }
+        th { background-color: #666666; color: #00BFFF; }
+        .up { color: #00FF00; }
+        .down { color: #FF0000; }
+    </style>
+</head>
+<body>
+    <h3 id="currentDateTime"></h3>
+    <table id="statusTable">
+        <thead>
+            <tr>
+                <th>NUM</th>
+                <th>DOMAIN</th>
+                <th>PORT</th>
+                <th>STATUS</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Status rows will be populated here -->
+        </tbody>
+    </table>
+
+    <script>
+        function fetchData() {
+            fetch('data.json') // 确保路径与 JSON 文件的实际位置相匹配
+                .then(response => response.json())
+                .then(data => {
+                    updateStatus(data.domains);
+                    updateUpdateTime(data.updateTime);
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        function updateStatus(domains) {
+            const statusTableBody = document.getElementById('statusTable').getElementsByTagName('tbody')[0];
+            statusTableBody.innerHTML = '';
+
+            domains.forEach((domain, index) => {
+                const statusClass = domain.status === 'UP' ? 'up' : 'down';
+                statusTableBody.innerHTML += `<tr><td>${index + 1}</td><td>${domain.displayName}</td><td>${domain.port}</td><td class="${statusClass}">${domain.status}</td></tr>`;
+            });
+        }
+
+        function updateUpdateTime(time) {
+            const dateTimeElement = document.getElementById('currentDateTime');
+            dateTimeElement.innerText = `${time}`;
+        }
+
+        setInterval(fetchData, 30000); // 每分钟更新一次
+        fetchData(); // 初始加载
+    </script>
+</body>
+</html>

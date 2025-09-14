@@ -1,0 +1,100 @@
+<?php
+// Include database connection settings
+include 'db.php'; // 确保文件名与您的环境一致
+
+$project_id = isset($_GET['id']) ? $_GET['id'] : 0;
+
+// Handle form submission
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["name_application"])) {
+    $name_application = $_POST["name_application"];
+
+    try {
+        // Prepare and execute statement to insert new application record with current timestamp
+        $stmt = $conn->prepare("INSERT INTO Ragdoll_IaC_Application (Project_ID, Application_Name, Application_Created_At) VALUES (?, ?, NOW())");
+        $stmt->bindParam(1, $project_id, PDO::PARAM_INT);
+        $stmt->bindParam(2, $name_application, PDO::PARAM_STR);
+        $stmt->execute();
+    } catch(PDOException $e) {
+        echo "Error: " . $e->getMessage();
+    }
+}
+
+// Fetch application records related to the given project ID
+try {
+    //$stmt = $conn->prepare("SELECT * FROM Ragdoll_IaC_Application WHERE Project_ID = ?");
+    $stmt = $conn->prepare("SELECT * FROM Ragdoll_IaC_Application WHERE Project_ID = ? ORDER BY Application_Created_At DESC");
+    $stmt->bindParam(1, $project_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch(PDOException $e) {
+    echo "Error: " . $e->getMessage();
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #00BFFF;
+            font-family: Arial, sans-serif;
+        }
+
+        input, button {
+            color: #00BFFF;
+            background-color: #000;
+            border: 1px solid #00BFFF;
+            width: 200px;
+            margin: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #00BFFF;
+            padding: 5px;
+            text-align: center;
+        }
+
+        a {
+            color: #00BFFF;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h2>Application Name</h2>
+        <form method="post" action="">
+            <input type="text" name="name_application" required placeholder="Application Name"><br>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+<br>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Application Name</th>
+            <th>Timestamp</th>
+        </tr>
+        <?php
+        foreach ($results as $row) {
+            echo "<tr>";
+            echo "<td>" . $row['Application_ID'] . "</td>";
+            echo "<td><a href='code.php?id=" . $row['Application_ID'] . "'>" . htmlspecialchars($row['Application_Name']) . "</a></td>";
+            echo "<td>" . $row['Application_Created_At'] . "</td>";
+            echo "</tr>";
+        }
+        ?>
+    </table>
+</body>
+</html>
+
+<?php
+$conn = null; // 使用 null 来关闭 PDO 连接
+?>
